@@ -4,38 +4,1412 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BlueCandy Saga - AyatSoft Games</title>
-    <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> <!-- For icons -->
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to bottom, #023e8a, #0077b6, #0096c7, #00b4d8, #48cae4, #90e0ef, #ade8f4, #caf0f8); /* Multi-stop blue gradient */
+            background-size: cover;
+            color: #fff; /* White text for contrast */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden; /* Prevent scrollbars */
+        }
+
+        /* --- Screen Management --- */
+        .screen {
+            display: none; /* Hide all screens by default */
+            background: rgba(0, 0, 50, 0.6); /* Semi-transparent dark blue background */
+            border-radius: 20px; /* Rounded corners */
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 100, 255, 0.5); /* Subtle glow */
+            max-width: 95%; /* Responsive width */
+            width: 450px; /* Max width */
+            margin: 10px auto; /* Center horizontally and add vertical space */
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(5px); /* Frosted glass effect */
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+            box-sizing: border-box; /* Include padding and border in element's total width and height */
+        }
+
+        .screen.active {
+            display: block; /* Show the active screen */
+        }
+
+        .screen-title {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #e0f7fa; /* Light blue */
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            background: linear-gradient(to right, #29b6f6, #4fc3f7); /* Blue gradient button */
+            color: white;
+            border: none;
+            border-radius: 25px; /* Pill shape */
+            padding: 12px 30px;
+            font-size: 1.2em;
+            cursor: pointer;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 5px 15px rgba(0, 100, 255, 0.4);
+            transition: background 0.3s ease, transform 0.1s ease, opacity 0.3s ease;
+            display: inline-block; /* Allows margin-bottom */
+            text-decoration: none; /* Remove underline for anchor tags */
+        }
+
+        .btn:hover {
+            background: linear-gradient(to right, #4fc3f7, #81d4fa);
+            transform: translateY(-2px); /* Lift effect */
+        }
+
+        .btn:active {
+            transform: translateY(0); /* Press effect */
+            box-shadow: 0 2px 10px rgba(0, 100, 255, 0.6);
+        }
+
+        .btn:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+            opacity: 0.6;
+        }
+
+        .btn-small {
+             padding: 8px 20px;
+             font-size: 1em;
+             margin: 5px;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #e0f7fa;
+            cursor: pointer;
+            margin: 0 5px;
+            padding: 5px;
+             transition: color 0.2s ease;
+        }
+         .btn-icon:hover {
+             color: #fff;
+         }
+
+
+        /* --- Home Screen --- */
+        #home-screen .screen-title {
+             margin-bottom: 30px;
+             font-size: 3em;
+        }
+         #home-screen .btn {
+             width: 80%;
+             max-width: 250px;
+         }
+
+        /* --- Levels Screen --- */
+        #levels-screen #levels-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* Flexible grid */
+            gap: 10px;
+            margin-top: 20px;
+        }
+        #levels-screen .level-button {
+            background: linear-gradient(to bottom right, #00b4d8, #0077b6);
+            color: white;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 15px 5px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+        }
+         #levels-screen .level-button.unlocked:not(:disabled):hover {
+             transform: scale(1.05);
+             box-shadow: 0 5px 15px rgba(0, 100, 255, 0.6);
+         }
+         #levels-screen .level-button:disabled {
+             background: #333;
+             color: #bbb;
+             border-color: rgba(255, 255, 255, 0.1);
+             cursor: not-allowed;
+             box-shadow: none;
+         }
+        #levels-screen .level-button.unlocked:disabled { /* Style for unlocked but potentially disabled during gameplay */
+             /* No specific style needed if handled correctly by enabling/disabling */
+         }
+
+
+        /* --- Game Screen --- */
+        #game-screen .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 0 10px;
+        }
+
+        #game-screen .game-info {
+            display: flex;
+            flex-direction: column; /* Stack score/moves/level vertically */
+            align-items: flex-start;
+            font-size: 1em;
+            color: #bbdefb;
+        }
+         #game-screen .game-info div {
+             margin-bottom: 3px;
+         }
+
+         #game-screen .game-controls {
+             display: flex;
+             align-items: center;
+         }
+
+
+        #game-board {
+            display: grid;
+            gap: 5px;
+            margin: 0 auto;
+            padding: 10px;
+            background-color: rgba(0, 0, 100, 0.3);
+            border-radius: 10px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+             /* Size will be set by JS based on board size */
+             width: fit-content; /* Adjust width to content */
+        }
+
+        .candy {
+            width: 50px; /* Default size */
+            height: 50px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.5em;
+            cursor: pointer;
+            transition: transform 0.2s ease, opacity 0.3s ease, box-shadow 0.2s ease;
+            user-select: none;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+             line-height: 1; /* Improve emoji centering */
+        }
+
+        .candy.selected {
+            border: 3px solid #ffeb3b; /* Yellow border for selected candy */
+            box-shadow: 0 0 15px #ffeb3b; /* Glow effect */
+            transform: scale(1.1); /* Slightly larger when selected */
+        }
+
+        .candy.removing {
+            opacity: 0;
+            transform: scale(0.5);
+        }
+
+        /* Responsive adjustments for candies */
+         @media (max-width: 600px) {
+             .candy {
+                 width: 40px;
+                 height: 40px;
+                 font-size: 2em;
+                 border-radius: 8px;
+             }
+             #game-board {
+                  gap: 3px;
+                  padding: 8px;
+             }
+         }
+          @media (max-width: 400px) {
+             .candy {
+                 width: 35px;
+                 height: 35px;
+                 font-size: 1.8em;
+                 border-radius: 7px;
+             }
+             #game-board {
+                  gap: 2px;
+                  padding: 5px;
+             }
+              #game-screen .game-info {
+                  font-size: 0.9em;
+              }
+               .btn-small {
+                  padding: 6px 15px;
+                  font-size: 0.9em;
+             }
+              .btn-icon {
+                  font-size: 1.3em;
+              }
+          }
+
+
+        /* --- Message Area --- */
+        .message-area {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #90caf9;
+            min-height: 1.5em;
+             opacity: 0; /* Hidden by default */
+             transition: opacity 0.3s ease;
+        }
+
+        /* --- Pop-up Modals (Win/Lose/Pause) --- */
+        .modal-overlay {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7); /* Dark overlay */
+            backdrop-filter: blur(3px);
+            z-index: 100; /* Above other content */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(to bottom, #003f7f, #006bbf);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            max-width: 90%;
+            width: 300px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-title {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+             color: #e0f7fa;
+             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-message {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            color: #bbdefb;
+        }
+
+        .modal-buttons .btn {
+             display: block; /* Stack buttons */
+             width: 100%;
+             box-sizing: border-box;
+             margin-bottom: 10px;
+             font-size: 1em;
+        }
+         .modal-buttons .btn:last-child {
+             margin-bottom: 0;
+         }
+
+        /* Specific pop-up styles */
+         #win-popup .modal-title { color: #a7ffeb; } /* Light cyan */
+         #lose-popup .modal-title { color: #ffab91; } /* Light red/orange */
+         #pause-popup .modal-title { color: #b388ff; } /* Light purple */
+
+
+         /* --- Settings Screen --- */
+         #settings-screen .setting-item {
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+             margin-bottom: 15px;
+             padding-bottom: 10px;
+             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+         }
+         #settings-screen .setting-item:last-child {
+              border-bottom: none;
+              margin-bottom: 0;
+              padding-bottom: 0;
+         }
+
+         #settings-screen .setting-item label {
+             font-size: 1.1em;
+             color: #bbdefb;
+         }
+         #settings-screen .setting-item input[type="checkbox"] {
+             width: 20px;
+             height: 20px;
+             cursor: pointer;
+         }
+
+
+         /* --- Developer Info Screen --- */
+         #dev-info-screen .info-item {
+             margin-bottom: 15px;
+             text-align: left;
+             padding: 0 10px;
+         }
+         #dev-info-screen .info-item strong {
+             color: #e0f7fa;
+             display: block; /* Label on its own line */
+             margin-bottom: 3px;
+         }
+         #dev-info-screen .info-item a {
+             color: #81d4fa; /* Light blue link */
+             text-decoration: none;
+             transition: color 0.2s ease;
+         }
+         #dev-info-screen .info-item a:hover {
+             color: #e0f7fa;
+             text-decoration: underline;
+         }
+
+
+    </style>
 </head>
 <body>
 
-    <div class="game-container">
-        <div class="game-title">BlueCandy Saga</div>
-        
-        <div class="game-info">
-            <div id="score">Score: 0</div>
-            <div id="level">Level: 1</div>
-            <div id="moves">Moves: 30</div> <!-- Example: Add moves for timed/limited modes -->
+    <!-- --- Audio Placeholders --- -->
+    <audio id="background-music" loop>
+        <!-- Replace with your blue-themed lo-fi music file -->
+        <source src="audio/background_music.mp3" type="audio/mpeg">
+        <source src="audio/background_music.ogg" type="audio/ogg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <audio id="match-sound">
+         <!-- Replace with your match/pop sound effect file -->
+        <source src="audio/match_sound.mp3" type="audio/mpeg">
+        <source src="audio/match_sound.ogg" type="audio/ogg">
+        Your browser does not support the audio element.
+    </audio>
+
+     <audio id="swap-sound">
+         <!-- Replace with your swap sound effect file -->
+        <source src="audio/swap_sound.mp3" type="audio/mpeg">
+        <source src="audio/swap_sound.ogg" type="audio/ogg">
+        Your browser does not support the audio element.
+    </audio>
+
+     <audio id="win-sound">
+         <!-- Replace with your win sound effect file -->
+        <source src="audio/win_sound.mp3" type="audio/mpeg">
+        <source src="audio/win_sound.ogg" type="audio/ogg">
+        Your browser does not support the audio element.
+    </audio>
+
+      <audio id="lose-sound">
+         <!-- Replace with your lose sound effect file -->
+        <source src="audio/lose_sound.mp3" type="audio/mpeg">
+        <source src="audio/lose_sound.ogg" type="audio/ogg">
+        Your browser does not support the audio element.
+    </audio>
+
+
+    <!-- --- Main Game Wrapper --- -->
+    <div id="game-wrapper">
+
+        <!-- --- Home Screen --- -->
+        <div id="home-screen" class="screen">
+            <div class="screen-title">BlueCandy Saga</div>
+             <button class="btn" id="home-play-btn">Play</button>
+             <button class="btn" id="home-levels-btn">Levels</button>
+             <button class="btn" id="home-settings-btn">Settings</button>
+             <button class="btn" id="home-dev-info-btn">Developer Info</button>
         </div>
 
-        <!-- This is where the game board will be created by JavaScript -->
-        <div id="game-board">
-            <!-- Candies will be added here -->
+        <!-- --- Levels Screen --- -->
+        <div id="levels-screen" class="screen">
+             <div class="screen-title">Select Level</div>
+             <div id="levels-list">
+                 <!-- Level buttons will be generated here -->
+             </div>
+             <button class="btn" id="levels-back-btn">Back</button>
         </div>
 
-        <!-- Potential areas for messages or power-ups -->
-        <div class="message-area">
-            <!-- Messages like "Match!", "Level Up!" -->
+        <!-- --- Game Screen --- -->
+        <div id="game-screen" class="screen">
+            <div class="game-header">
+                <div class="game-info">
+                    <div id="score">Score: 0</div>
+                    <div id="level">Level: 1</div>
+                    <div id="moves">Moves: 0</div> <!-- Will show remaining moves -->
+                     <div id="goal">Goal: Score 0</div> <!-- Will show target score -->
+                </div>
+                <div class="game-controls">
+                     <button class="btn-icon" id="pause-button"><i class="fas fa-pause"></i></button>
+                     <button class="btn-icon" id="back-button"><i class="fas fa-home"></i></button> <!-- Home icon for Back -->
+                </div>
+            </div>
+
+            <div id="game-board">
+                <!-- Candies will be added here by JavaScript -->
+            </div>
+
+            <div class="message-area">
+                <!-- In-game messages -->
+            </div>
         </div>
 
-        <!-- Basic button (you'll need more complex UI for full game) -->
-        <button class="play-button" id="start-button">Start Game</button> 
-        <!-- Later: HomeScreen, Levels Map, Settings, Shop, Leaderboard divs -->
+         <!-- --- Settings Screen --- -->
+         <div id="settings-screen" class="screen">
+             <div class="screen-title">Settings</div>
+              <div class="setting-item">
+                  <label for="music-toggle">Music</label>
+                  <input type="checkbox" id="music-toggle" checked>
+              </div>
+              <div class="setting-item">
+                  <label for="sfx-toggle">Sound Effects</label>
+                  <input type="checkbox" id="sfx-toggle" checked>
+              </div>
+             <!-- Add more settings here (e.g., Dark Mode toggle) -->
+             <button class="btn" id="settings-back-btn">Back</button>
+         </div>
 
+         <!-- --- Developer Info Screen --- -->
+         <div id="dev-info-screen" class="screen">
+             <div class="screen-title">Developer Info</div>
+              <div class="info-item">
+                  <strong>Developer Name:</strong> Arafat Rahman Ayat
+              </div>
+               <div class="info-item">
+                  <strong>Role:</strong> Indie Developer, YouTuber, Tech Lover, Student
+              </div>
+              <div class="info-item">
+                   <strong>Game Studio Name:</strong> AyatSoft Games (Your Brand Name)
+               </div>
+              <div class="info-item">
+                  <strong>Contact Gmail:</strong> <a href="mailto:ayatofficial88@gmail.com">ayatofficial88@gmail.com</a>
+              </div>
+              <div class="info-item">
+                   <strong>YouTube:</strong> <a href="https://www.youtube.com/channel/YOUR_CHANNEL_ID" target="_blank">Tech With Ayat</a> <!-- Replace YOUR_CHANNEL_ID -->
+               </div>
+               <div class="info-item">
+                   <strong>Telegram:</strong> <a href="https://t.me/YOUR_TELEGRAM_HANDLE" target="_blank">TWA X Main</a> <!-- Replace YOUR_TELEGRAM_HANDLE -->
+               </div>
+               <div class="info-item">
+                   <strong>Website:</strong> <a href="https://twayat.my.id" target="_blank">twayat.my.id</a>
+               </div>
+               <div class="info-item">
+                   <strong>Game Development Focus:</strong> Casual Games, Puzzle Games, AI-Powered Apps, and Blue-Themed Experiences
+               </div>
+
+              <button class="btn" id="dev-info-back-btn">Back</button>
+         </div>
+
+
+    </div> <!-- End #game-wrapper -->
+
+
+    <!-- --- Pop-up Modals --- -->
+
+    <!-- Win Pop-up -->
+    <div id="win-popup" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-title">Level Complete!</div>
+            <div class="modal-message" id="win-message"></div>
+            <div class="modal-buttons">
+                <button class="btn" id="next-level-btn">Next Level</button>
+                <button class="btn" id="win-levels-btn">Levels</button>
+            </div>
+        </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Lose Pop-up -->
+    <div id="lose-popup" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-title">Game Over!</div>
+            <div class="modal-message" id="lose-message"></div>
+             <div class="modal-buttons">
+                <button class="btn" id="retry-level-btn">Retry</button>
+                <button class="btn" id="lose-levels-btn">Levels</button>
+            </div>
+        </div>
+    </div>
+
+     <!-- Pause Pop-up -->
+    <div id="pause-popup" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-title">Paused</div>
+             <div class="modal-buttons">
+                 <button class="btn" id="resume-button">Resume</button>
+                 <button class="btn" id="pause-levels-btn">Levels</button>
+                 <button class="btn" id="pause-home-btn">Home</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- Game State Variables ---
+        let boardWidth = 8; // Default board size (can change per level)
+        let boardHeight = 8;
+        let board = []; // 2D array representing the board
+        // Updated candy emojis - some blue-themed ones
+        let candies = ["💧", "❄️", "💎", "🫐", "🧊", "💙"]; // Water drop, Snowflake, Gem, Blueberry, Ice Cube, Blue Heart
+        let score = 0;
+        let currentLevel = 1; // Start at Level 1
+        let movesRemaining = 0; // Moves for the current level
+        let levelTargetScore = 0; // Score needed to win the level
+
+        let selectedCandyElement = null; // DOM element of the selected candy
+        let isSwapping = false; // Flag to prevent multiple swaps at once
+        let isProcessingBoard = false; // Flag to indicate if board is currently cascading/filling
+
+        // --- Level Configuration (Simplified for 10 levels) ---
+        // In a real game, this would be more detailed (board size, specific candy types, power-ups, etc.)
+        const levelConfigs = {
+            1: { targetScore: 500, moves: 30, width: 8, height: 8, candyTypes: ["💧", "❄️", "💎", "🫐"] }, // Easier
+            2: { targetScore: 750, moves: 28, width: 8, height: 8, candyTypes: ["💧", "❄️", "💎", "🫐", "🧊"] },
+            3: { targetScore: 1000, moves: 25, width: 8, height: 8, candyTypes: ["💧", "❄️", "💎", "🫐", "🧊", "💙"] },
+            4: { targetScore: 1250, moves: 25, width: 9, height: 9, candyTypes: ["💧", "❄️", "💎", "🫐", "🧊", "💙"] }, // Slightly bigger board
+            5: { targetScore: 1500, moves: 23, width: 9, height: 9, candyTypes: ["💧", "❄️", "💎", "🫐", "🧊", "💙"] },
+            6: { targetScore: 1750, moves: 22, width: 9, height: 9, candyTypes: ["💧", "❄️", "💎", "🫐", "🧊", "💙"] },
+            7: { targetScore: 2000, moves: 20, width: 10, height: 10, candyTypes: ["💧", "❄️", "💎", "🫐", "🧊", "💙"] }, // Harder
+            8: { targetScore: 2250, moves: 20, width: 10, height: 10, candyTypes: ["💧", "❄️", "💎", "🫐", "🧊", "💙"] },
+            9: { targetScore: 2500, moves: 18, width: 10, height: 10, candyTypes: ["💧", "❄️", "💎", "🫐", "🧊", "💙"] },
+            10: { targetScore: 3000, moves: 15, width: 10, height: 10, candyTypes: ["💧", "❄️", "💎", "🫐", "🧊", "💙"] }, // Boss-like
+            // Add configurations for levels 11-100 here...
+            // Example:
+            // 11: { targetScore: 3500, moves: 15, width: 10, height: 10, candyTypes: ["💧", "❄️", "💎", "🫐", "🧊", "💙"] },
+            // ... up to 100
+        };
+        const totalLevels = Object.keys(levelConfigs).length; // Count levels defined
+
+        // --- Audio Elements ---
+        const backgroundMusic = document.getElementById('background-music');
+        const matchSound = document.getElementById('match-sound');
+        const swapSound = document.getElementById('swap-sound');
+        const winSound = document.getElementById('win-sound');
+        const loseSound = document.getElementById('lose-sound');
+
+        // --- Settings ---
+        let musicEnabled = localStorage.getItem('musicEnabled') !== 'false'; // Default true
+        let sfxEnabled = localStorage.getItem('sfxEnabled') !== 'false'; // Default true
+
+
+        // --- Get DOM Elements ---
+        const gameWrapper = document.getElementById('game-wrapper');
+        const screens = document.querySelectorAll('.screen');
+
+        // Home Screen
+        const homeScreen = document.getElementById('home-screen');
+        const homePlayBtn = document.getElementById('home-play-btn');
+        const homeLevelsBtn = document.getElementById('home-levels-btn');
+        const homeSettingsBtn = document.getElementById('home-settings-btn');
+        const homeDevInfoBtn = document.getElementById('home-dev-info-btn');
+
+        // Levels Screen
+        const levelsScreen = document.getElementById('levels-screen');
+        const levelsList = document.getElementById('levels-list');
+        const levelsBackBtn = document.getElementById('levels-back-btn');
+
+        // Game Screen
+        const gameScreen = document.getElementById('game-screen');
+        const scoreDisplay = document.getElementById('score');
+        const levelDisplay = document.getElementById('level');
+        const movesDisplay = document.getElementById('moves');
+        const goalDisplay = document.getElementById('goal');
+        const gameBoard = document.getElementById('game-board');
+        const messageArea = document.querySelector('.message-area');
+        const pauseButton = document.getElementById('pause-button');
+        const backButton = document.getElementById('back-button');
+
+
+        // Settings Screen
+        const settingsScreen = document.getElementById('settings-screen');
+        const musicToggle = document.getElementById('music-toggle');
+        const sfxToggle = document.getElementById('sfx-toggle');
+        const settingsBackBtn = document.getElementById('settings-back-btn');
+
+        // Developer Info Screen
+        const devInfoScreen = document.getElementById('dev-info-screen');
+        const devInfoBackBtn = document.getElementById('dev-info-back-btn');
+
+
+        // Pop-up Modals
+        const winPopup = document.getElementById('win-popup');
+        const winMessage = document.getElementById('win-message');
+        const nextLevelBtn = document.getElementById('next-level-btn');
+        const winLevelsBtn = document.getElementById('win-levels-btn');
+
+        const losePopup = document.getElementById('lose-popup');
+        const loseMessage = document.getElementById('lose-message');
+        const retryLevelBtn = document.getElementById('retry-level-btn');
+        const loseLevelsBtn = document.getElementById('lose-levels-btn');
+
+        const pausePopup = document.getElementById('pause-popup');
+        const resumeButton = document.getElementById('resume-button');
+        const pauseLevelsBtn = document.getElementById('pause-levels-btn');
+        const pauseHomeBtn = document.getElementById('pause-home-btn');
+
+
+        // --- Screen Management Functions ---
+        function showScreen(screenId) {
+            screens.forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+
+            // Manage music based on screen (optional)
+            if (screenId === 'game-screen') {
+                 playMusic();
+            } else {
+                 stopMusic(); // Stop music on other screens? Or play menu music?
+                 // For now, stop. You can add different music for menu later.
+            }
+             // Ensure game loop stops/pauses when leaving game screen
+             if (screenId !== 'game-screen') {
+                 isProcessingBoard = false; // Stop board processing loop
+                 isSwapping = true; // Prevent swaps
+                 // In a real game, you'd need to cancel ongoing timeouts/animations
+                 hideAllModals(); // Hide any active popups
+             } else {
+                  isSwapping = false; // Re-enable swaps if entering game
+             }
+        }
+
+        function showModal(modalId) {
+            hideAllModals(); // Hide any other modals first
+            document.getElementById(modalId).style.display = 'flex'; // Use flex to center content
+        }
+
+        function hideModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function hideAllModals() {
+            winPopup.style.display = 'none';
+            losePopup.style.display = 'none';
+            pausePopup.style.display = 'none';
+             // Hide game screen controls temporarily while modal is open (optional)
+             gameScreen.querySelector('.game-header').style.filter = 'none';
+        }
+
+
+        // --- Audio Functions ---
+        function playMusic() {
+            if (musicEnabled && backgroundMusic.paused) {
+                 // Add a small delay or user interaction requirement for autoplay
+                 // Browsers often block autoplay without user interaction.
+                 // A click on the home screen might be enough.
+                 backgroundMusic.volume = 0.3; // Set a reasonable volume
+                 backgroundMusic.play().catch(e => console.log("Music autoplay prevented:", e));
+            }
+        }
+
+        function stopMusic() {
+             if (!backgroundMusic.paused) {
+                 backgroundMusic.pause();
+                 backgroundMusic.currentTime = 0; // Rewind
+             }
+        }
+
+        function playSound(soundElement) {
+            if (sfxEnabled && soundElement) {
+                 // Clone node to play multiple sounds quickly (e.g., multiple matches)
+                 const soundClone = soundElement.cloneNode();
+                 soundClone.volume = 0.5; // Set a reasonable volume for effects
+                 soundClone.play().catch(e => console.log("SFX playback prevented:", e));
+            }
+        }
+
+        function updateAudioSettings() {
+             musicEnabled = musicToggle.checked;
+             sfxEnabled = sfxToggle.checked;
+             localStorage.setItem('musicEnabled', musicEnabled);
+             localStorage.setItem('sfxEnabled', sfxEnabled);
+
+             if (musicEnabled) {
+                 // If on a screen that plays music, start it
+                 if (gameScreen.classList.contains('active')) {
+                      playMusic();
+                 } // Add other screens if they have music
+             } else {
+                 stopMusic();
+             }
+        }
+
+
+        // --- Level List Rendering ---
+        function renderLevelsList() {
+            levelsList.innerHTML = ''; // Clear existing buttons
+            const unlockedLevel = parseInt(localStorage.getItem('unlockedLevel') || '1'); // Load saved progress
+
+            for (let i = 1; i <= totalLevels; i++) {
+                const levelBtn = document.createElement('button');
+                levelBtn.classList.add('btn', 'level-button');
+                levelBtn.textContent = i;
+                levelBtn.dataset.level = i; // Store level number
+
+                if (i > unlockedLevel) {
+                    levelBtn.disabled = true; // Disable locked levels
+                } else {
+                    levelBtn.classList.add('unlocked'); // Add unlocked class for styling
+                }
+
+                levelBtn.addEventListener('click', () => {
+                    if (!levelBtn.disabled) {
+                         startGame(i);
+                    }
+                });
+                levelsList.appendChild(levelBtn);
+            }
+        }
+
+        // --- Game Initialization ---
+        function startGame(levelNumber) {
+            if (!levelConfigs[levelNumber]) {
+                 console.error("Level configuration not found:", levelNumber);
+                 showMessage("Level not available!", 1500);
+                 return; // Stop if level doesn't exist
+            }
+
+            currentLevel = levelNumber;
+            const config = levelConfigs[currentLevel];
+
+            score = 0;
+            movesRemaining = config.moves;
+            levelTargetScore = config.targetScore;
+            boardWidth = config.width;
+            boardHeight = config.height;
+            candies = config.candyTypes; // Use specific candies for the level
+
+            updateScoreDisplay();
+            updateLevelDisplay();
+            updateMovesDisplay();
+            updateGoalDisplay();
+
+            createBoard();
+            showScreen('game-screen');
+
+            // Resolve any initial matches on the new board
+            resolveInitialMatches();
+        }
+
+        function createBoard() {
+            gameBoard.innerHTML = ''; // Clear previous board
+            gameBoard.style.gridTemplateColumns = `repeat(${boardWidth}, 1fr)`; // Set CSS grid columns
+
+            board = []; // Reset board array
+            for (let r = 0; r < boardHeight; r++) {
+                board[r] = [];
+                for (let c = 0; c < boardWidth; c++) {
+                    // Place a random candy, ensuring no immediate matches of 3+
+                    let candyType;
+                     do {
+                        candyType = candies[Math.floor(Math.random() * candies.length)];
+                     } while (
+                        (c >= 2 && board[r][c - 1] === candyType && board[r][c - 2] === candyType) || // Check horizontal match left
+                        (r >= 2 && board[r - 1][c] === candyType && board[r - 2][c] === candyType)    // Check vertical match up
+                     );
+
+                    board[r][c] = candyType;
+                    // Candy elements will be added/updated in updateBoardDOM
+                }
+            }
+             updateBoardDOM(); // Populate the DOM initially
+        }
+
+        function createCandyElement(candyType, row, col) {
+            const element = document.createElement('div');
+            element.classList.add('candy');
+            element.textContent = candyType; // Use emoji directly
+            element.dataset.row = row;
+            element.dataset.col = col;
+            element.style.width = `${gameBoard.clientWidth / boardWidth - (boardWidth > 1 ? (parseInt(getComputedStyle(gameBoard).gap) || 0) : 0) * (boardWidth - 1) / boardWidth}px`; // Calculate size dynamically
+             element.style.height = element.style.width; // Keep it square
+            element.addEventListener('click', handleCandyClick);
+            return element;
+        }
+
+        // --- Display Updates ---
+        function updateScoreDisplay() {
+            scoreDisplay.textContent = `Score: ${score}`;
+        }
+
+        function updateLevelDisplay() {
+            levelDisplay.textContent = `Level: ${currentLevel}`;
+        }
+
+        function updateMovesDisplay() {
+             movesDisplay.textContent = `Moves: ${movesRemaining}`;
+        }
+         function updateGoalDisplay() {
+             goalDisplay.textContent = `Goal: Score ${levelTargetScore}`;
+         }
+
+
+        // --- Core Game Loop & Logic ---
+
+        // Resolves initial matches (no score/moves impact)
+        async function resolveInitialMatches() {
+             isProcessingBoard = true;
+            let matchesFound = true;
+            while(matchesFound) {
+                matchesFound = false;
+                let matches = findMatches();
+                if (matches.length > 0) {
+                     matchesFound = true;
+                     // Mark for removal without scoring
+                     matches.forEach(pos => {
+                         board[pos.row][pos.col] = null; // Mark as empty
+                         const element = getCandyElementByPosition(pos.row, pos.col);
+                         if (element) element.classList.add('removing');
+                     });
+
+                     await new Promise(resolve => setTimeout(resolve, 300)); // Delay visually before removing
+                     updateBoardDOM(); // Update DOM after marking for removal
+
+                     await new Promise(resolve => setTimeout(resolve, 500)); // Delay for removal animation
+
+                     cascadeCandies();
+                     await new Promise(resolve => setTimeout(resolve, 500)); // Delay for cascading animation
+                     fillBoard();
+                     await new Promise(resolve => setTimeout(resolve, 500)); // Delay for filling animation
+                     updateBoardDOM(); // Update DOM after cascade/fill
+                }
+            }
+            console.log("Initial board resolved. Ready to play!");
+            showMessage("Go!", 1000);
+             isProcessingBoard = false;
+             isSwapping = false; // Re-enable swapping only after initial resolution
+        }
+
+        // Main game processing loop (after a successful swap)
+        async function processBoard() {
+             isProcessingBoard = true;
+            let matchesFound = true;
+            while(matchesFound) {
+                matchesFound = false;
+                let matches = findMatches();
+                if (matches.length > 0) {
+                     matchesFound = true;
+                     showMessage(matches.length > 5 ? "Great!" : (matches.length > 3 ? "Nice!" : "Match!"), 800);
+                     playSound(matchSound); // Play match sound
+
+                     // Score and mark for removal
+                     removeMatches(matches);
+
+                     await new Promise(resolve => setTimeout(resolve, 300)); // Delay before removal animation
+                     updateBoardDOM(); // Update DOM after marking
+
+                     await new Promise(resolve => setTimeout(resolve, 500)); // Delay for removal animation
+
+                     cascadeCandies();
+                     await new Promise(resolve => setTimeout(resolve, 500)); // Delay for cascading animation
+                     fillBoard();
+                     await new Promise(resolve => setTimeout(resolve, 500)); // Delay for filling animation
+                     updateBoardDOM(); // Update DOM after cascade/fill
+
+                    // Loop again to check for new matches created by falling candies
+                }
+            }
+             isProcessingBoard = false; // Processing finished
+            checkGameEnd(); // Check game end condition after all cascades resolve
+             isSwapping = false; // Re-enable swapping once processing is completely done
+        }
+
+
+        async function handleCandyClick(event) {
+            if (isSwapping || isProcessingBoard || movesRemaining <= 0) {
+                 // Ignore clicks if a swap is in progress, board is processing, or moves are out
+                return;
+            }
+
+            const clickedElement = event.target;
+            const row = parseInt(clickedElement.dataset.row);
+            const col = parseInt(clickedElement.dataset.col);
+
+            if (selectedCandyElement === null) {
+                // First candy selected
+                selectedCandyElement = clickedElement;
+                selectedCandyElement.classList.add('selected');
+            } else {
+                // Second candy selected
+                const selectedRow = parseInt(selectedCandyElement.dataset.row);
+                const selectedCol = parseInt(selectedCandyElement.dataset.col);
+
+                const isAdjacent = (
+                    (Math.abs(row - selectedRow) === 1 && col === selectedCol) || // Vertical
+                    (Math.abs(col - selectedCol) === 1 && row === selectedRow)   // Horizontal
+                );
+
+                // Deselect previous immediately
+                selectedCandyElement.classList.remove('selected');
+
+                if (isAdjacent) {
+                    // Attempt Swap
+                    isSwapping = true; // Set swapping flag
+                    await attemptSwap({ row: selectedRow, col: selectedCol }, { row, col });
+
+                } else {
+                    // Clicked a non-adjacent candy, select it instead
+                    selectedCandyElement = clickedElement;
+                    selectedCandyElement.classList.add('selected');
+                }
+                 // Reset selected after attemptSwap or re-selection
+                 if (!isAdjacent) {
+                      // If not adjacent, we just re-selected, so keep one selected
+                 } else {
+                     // If adjacent, swap attempt is finished (either successful or not), so clear selection
+                      selectedCandyElement = null;
+                 }
+            }
+        }
+
+        async function attemptSwap(pos1, pos2) {
+             // Get the candy types from the board array
+            const candy1Type = board[pos1.row][pos1.col];
+            const candy2Type = board[pos2.row][pos2.col];
+
+             // Get the actual DOM elements
+             const element1 = getCandyElementByPosition(pos1.row, pos1.col);
+             const element2 = getCandyElementByPosition(pos2.row, pos2.col);
+
+             if (!element1 || !element2) {
+                 console.error("Missing candy element during swap attempt.");
+                  isSwapping = false; // Reset flag
+                 return;
+             }
+
+            // --- Visual Swap (CSS Transform) ---
+            // Calculate directions and distances for animation
+            const rect1 = element1.getBoundingClientRect();
+            const rect2 = element2.getBoundingClientRect();
+            const dx = rect2.left - rect1.left;
+            const dy = rect2.top - rect1.top;
+
+            // Apply transform for the visual swap
+            element1.style.transform = `translate(${dx}px, ${dy}px)`;
+            element2.style.transform = `translate(${-dx}px, ${-dy}px)`;
+            element1.style.zIndex = 1; // Bring selected candy to front during swap
+            element2.style.zIndex = 1;
+
+             playSound(swapSound); // Play swap sound
+
+            // Wait for the visual swap animation to complete
+            await new Promise(resolve => setTimeout(resolve, 200)); // Match CSS transition duration
+
+            // --- Logical Swap (in the board array) ---
+            board[pos1.row][pos1.col] = candy2Type;
+            board[pos2.row][pos2.col] = candy1Type;
+
+             // Reset transforms and z-index
+             element1.style.transform = '';
+             element2.style.transform = '';
+             element1.style.zIndex = '';
+             element2.style.zIndex = '';
+
+             // Crucially, update the data attributes and textContent *after* the swap animation
+             // This synchronizes the elements with their new logical positions and types
+              element1.dataset.row = pos2.row; // element1 is now logically at pos2
+              element1.dataset.col = pos2.col;
+              element2.dataset.row = pos1.row; // element2 is now logically at pos1
+              element2.dataset.col = pos1.col;
+
+              // Update text content to match the logical candy type at the new position
+              element1.textContent = candy2Type; // Element originally at pos1 now shows candy2Type
+              element2.textContent = candy1Type; // Element originally at pos2 now shows candy1Type
+
+
+            // Check for matches after the swap
+            let matches = findMatches();
+
+            if (matches.length > 0) {
+                // Valid swap - process matches!
+                movesRemaining--; // Decrement moves on a successful swap that creates a match
+                updateMovesDisplay();
+                processBoard(); // Start the main processing loop
+
+            } else {
+                // Invalid swap - no match
+                showMessage("No Match", 800);
+                 // Swap back visually
+                element1.style.transform = `translate(${-dx}px, ${-dy}px)`; // Element at pos2 animates back to pos1 visual spot
+                element2.style.transform = `translate(${dx}px, ${dy}px)`; // Element at pos1 animates back to pos2 visual spot
+                 element1.style.zIndex = 1;
+                 element2.style.zIndex = 1;
+                 playSound(swapSound); // Play swap back sound
+
+                 await new Promise(resolve => setTimeout(resolve, 200)); // Wait for swap back animation
+
+                // Swap back in the board array
+                board[pos1.row][pos1.col] = candy1Type;
+                board[pos2.row][pos2.col] = candy2Type;
+
+                 // Reset transforms, z-index, data attributes, and textContent after swap back
+                 element1.style.transform = '';
+                 element2.style.transform = '';
+                 element1.style.zIndex = '';
+                 element2.style.zIndex = '';
+
+                 element1.dataset.row = pos1.row; // Element originally at pos1 goes back to pos1
+                 element1.dataset.col = pos1.col;
+                 element2.dataset.row = pos2.row; // Element originally at pos2 goes back to pos2
+                 element2.dataset.col = pos2.col;
+
+                 element1.textContent = candy1Type; // Restore original candy types
+                 element2.textContent = candy2Type;
+
+                isSwapping = false; // Reset swapping flag
+            }
+
+            // Selection is cleared in handleCandyClick now
+        }
+
+
+        function findMatches() {
+            const matches = []; // Stores positions {row, col} of candies in matches
+            const boardCopy = board.map(row => row.slice()); // Work on a copy
+
+            // Helper to check if a position is already in the matches list
+            const isPositionInMatches = (r, c) => matches.some(pos => pos.row === r && pos.col === c);
+
+            // Check horizontal matches
+            for (let r = 0; r < boardHeight; r++) {
+                for (let c = 0; c < boardWidth - 2; c++) {
+                    const type = boardCopy[r][c];
+                    if (type !== null && type === boardCopy[r][c + 1] && type === boardCopy[r][c + 2]) {
+                        // Found a match of 3+
+                        let currentC = c;
+                        while (currentC < boardWidth && boardCopy[r][currentC] === type) {
+                            if (!isPositionInMatches(r, currentC)) {
+                                matches.push({ row: r, col: currentC });
+                            }
+                             // Mark as checked to avoid reprocessing
+                             boardCopy[r][currentC] = 'checked';
+                            currentC++;
+                        }
+                    }
+                }
+            }
+
+            // Check vertical matches
+            for (let c = 0; c < boardWidth; c++) {
+                for (let r = 0; r < boardHeight - 2; r++) {
+                     const type = board[r][c]; // Use original board as horizontal checking didn't nullify
+                     if (type !== null && type === board[r + 1][c] && type === board[r + 2][c]) {
+                        // Found a match of 3+
+                        let currentR = r;
+                        while (currentR < boardHeight && board[currentR][c] === type) {
+                             if (!isPositionInMatches(currentR, c)) {
+                                matches.push({ row: currentR, col: c });
+                             }
+                             currentR++;
+                         }
+                    }
+                }
+            }
+
+            // Note: The original boardCopy marking is not ideal if vertical checks use original board.
+            // A more robust way is to collect positions and then filter unique ones, or use a separate `matchedPositions` set.
+            // Let's use a Set for uniqueness as in the previous code, but ensure we handle nulls.
+
+            const uniqueMatchesSet = new Set();
+            const collectedMatches = [];
+
+             // Re-check horizontal
+             for (let r = 0; r < boardHeight; r++) {
+                for (let c = 0; c < boardWidth - 2; c++) {
+                    const type = board[r][c];
+                     if (type !== null && type === board[r][c + 1] && type === board[r][c + 2]) {
+                         for (let i = 0; c + i < boardWidth && board[r][c + i] === type; i++) {
+                             const posKey = `${r}-${c + i}`;
+                             if (!uniqueMatchesSet.has(posKey)) {
+                                 uniqueMatchesSet.add(posKey);
+                                 collectedMatches.push({ row: r, col: c + i });
+                             }
+                         }
+                    }
+                }
+            }
+
+             // Re-check vertical
+             for (let c = 0; c < boardWidth; c++) {
+                for (let r = 0; r < boardHeight - 2; r++) {
+                    const type = board[r][c];
+                     if (type !== null && type === board[r + 1][c] && type === board[r + 2][c]) {
+                          for (let i = 0; r + i < boardHeight && board[r + i][c] === type; i++) {
+                             const posKey = `${r + i}-${c}`;
+                             if (!uniqueMatchesSet.has(posKey)) {
+                                 uniqueMatchesSet.add(posKey);
+                                 collectedMatches.push({ row: r + i, col: c });
+                             }
+                         }
+                    }
+                }
+            }
+
+            return collectedMatches; // Return the list of unique positions in matches
+        }
+
+        function removeMatches(matches) {
+            const baseScorePerCandy = 10;
+            score += matches.length * baseScorePerCandy;
+            updateScoreDisplay();
+
+            matches.forEach(pos => {
+                board[pos.row][pos.col] = null; // Mark as empty
+                const element = getCandyElementByPosition(pos.row, pos.col);
+                if (element) {
+                    element.classList.add('removing'); // Add class for fade-out
+                    // Element will be removed from DOM in updateBoardDOM later
+                }
+            });
+        }
+
+        function cascadeCandies() {
+            for (let c = 0; c < boardWidth; c++) {
+                let emptySpaces = 0;
+                for (let r = boardHeight - 1; r >= 0; r--) {
+                    if (board[r][c] === null) {
+                        emptySpaces++;
+                    } else if (emptySpaces > 0) {
+                        // Move candy down in the array
+                        board[r + emptySpaces][c] = board[r][c];
+                        board[r][c] = null;
+                        // Note: Visual cascading is handled by re-rendering in updateBoardDOM for simplicity here.
+                        // A complex implementation would animate elements moving.
+                    }
+                }
+            }
+        }
+
+        function fillBoard() {
+            for (let c = 0; c < boardWidth; c++) {
+                for (let r = 0; r < boardHeight; r++) {
+                    if (board[r][c] === null) {
+                        // Fill empty spot with a new random candy
+                        board[r][c] = candies[Math.floor(Math.random() * candies.length)];
+                    }
+                }
+            }
+        }
+
+        // Helper function to get a candy element from the DOM by its data attributes
+        // This relies on the data-row/data-col attributes being updated correctly after swaps/cascades
+        function getCandyElementByPosition(row, col) {
+             // Use querySelector on the gameBoard element to limit search scope
+            return gameBoard.querySelector(`.candy[data-row="${row}"][data-col="${col}"]`);
+        }
+
+
+        // Update the visual board in the DOM to match the board array state
+        // This version re-creates the DOM elements for simplicity after cascade/fill,
+        // which means smooth falling animations of *existing* candies are not shown.
+        function updateBoardDOM() {
+             // Remove elements marked for removal
+             gameBoard.querySelectorAll('.candy.removing').forEach(el => el.remove());
+
+             // Clear the DOM board entirely before re-populating
+             gameBoard.innerHTML = '';
+
+              for (let r = 0; r < boardHeight; r++) {
+                 for (let c = 0; c < boardWidth; c++) {
+                     const candyType = board[r][c];
+                     if (candyType !== null) {
+                          const candyElement = createCandyElement(candyType, r, c);
+                          gameBoard.appendChild(candyElement);
+                     } else {
+                         // If a spot is empty, add a placeholder or rely on grid gaps
+                         // Adding a div can help maintain grid structure visually if using gaps
+                         // gameBoard.appendChild(document.createElement('div')); // Optional
+                     }
+                 }
+             }
+             // After re-creation, re-calculate and set candy sizes if necessary
+             // This accounts for potential board size changes per level
+             adjustCandySizes();
+        }
+
+         function adjustCandySizes() {
+             const boardGap = parseInt(getComputedStyle(gameBoard).gap) || 0;
+             const boardPadding = parseInt(getComputedStyle(gameBoard).padding) || 0;
+             const totalBoardWidth = gameBoard.clientWidth;
+             const candySize = (totalBoardWidth - (boardWidth - 1) * boardGap) / boardWidth;
+
+             gameBoard.querySelectorAll('.candy').forEach(candyElement => {
+                 candyElement.style.width = `${candySize}px`;
+                 candyElement.style.height = `${candySize}px`;
+                 // Adjust font size based on candy size
+                 candyElement.style.fontSize = `${candySize * 0.5}px`; // Example: 50% of candy size
+             });
+         }
+
+
+        function showMessage(text, duration = 1500) {
+            messageArea.textContent = text;
+            messageArea.style.opacity = 1;
+            // Clear any previous timeout
+            if (messageArea.timeoutId) clearTimeout(messageArea.timeoutId);
+            messageArea.timeoutId = setTimeout(() => {
+                messageArea.style.opacity = 0;
+                messageArea.timeoutId = null;
+            }, duration);
+        }
+
+        // --- Game End Conditions ---
+        function checkGameEnd() {
+            // Check win condition first
+            if (score >= levelTargetScore) {
+                 // Check if there are still possible moves, or if moves ran out but score met goal
+                 // For simplicity, let's assume if score target is met, player wins,
+                 // even if moves run out on the *same* turn the goal is met.
+                 // A more complex check would ensure possible moves remain if moves > 0.
+                 endGame(true); // Win!
+                 return; // Stop checking
+            }
+
+            // Check lose condition
+            if (movesRemaining <= 0) {
+                // Check if the board is stuck (no more possible moves) - this is complex
+                // For simplicity, lose if moves run out and score target wasn't met
+                endGame(false); // Lose!
+                return; // Stop checking
+            }
+
+            // Optional: Check if board is stuck even with moves remaining
+            // Requires implementing a function to check for any possible 3-matches via swapping.
+            // If stuck: endGame(false); // Lose!
+        }
+
+        function endGame(isWin) {
+             isProcessingBoard = true; // Stop further game processing
+
+            if (isWin) {
+                 showMessage("Level Complete!", 2000);
+                 playSound(winSound);
+                 winMessage.textContent = `Level ${currentLevel} complete! You scored ${score}. Target: ${levelTargetScore}`;
+                 showModal('win-popup');
+
+                 // Unlock next level if this one was the highest unlocked so far
+                 const unlockedLevel = parseInt(localStorage.getItem('unlockedLevel') || '1');
+                 if (currentLevel >= unlockedLevel && currentLevel < totalLevels) {
+                     localStorage.setItem('unlockedLevel', currentLevel + 1);
+                     // Re-render level list when player goes back to level screen
+                     renderLevelsList(); // Update the list buttons for the next level
+                 }
+                 // Disable "Next Level" button if it's the last level
+                 if (currentLevel >= totalLevels) {
+                     nextLevelBtn.disabled = true;
+                     nextLevelBtn.textContent = "No More Levels";
+                 } else {
+                      nextLevelBtn.disabled = false;
+                      nextLevelBtn.textContent = "Next Level";
+                 }
+
+            } else {
+                 showMessage("Game Over!", 2000);
+                 playSound(loseSound);
+                 loseMessage.textContent = `Level ${currentLevel} failed. You scored ${score}. Target: ${levelTargetScore}. Moves ran out.`;
+                 showModal('lose-popup');
+            }
+        }
+
+        // --- Pause/Resume ---
+        let isPaused = false;
+
+        function togglePause() {
+             isPaused = !isPaused;
+             if (isPaused) {
+                 showModal('pause-popup');
+                 // Pause music? Stop sounds?
+                 // In a real game, you'd need to stop animations/timeouts.
+                 // For now, the isProcessingBoard/isSwapping flags and modal overlay prevent input.
+             } else {
+                 hideModal('pause-popup');
+                 // Resume animations/timeouts if needed
+                 // Resume music?
+             }
+        }
+
+
+        // --- Event Listeners ---
+
+        // Home Screen Buttons
+        homePlayBtn.addEventListener('click', () => startGame(currentLevel)); // Start game from current unlocked level
+        homeLevelsBtn.addEventListener('click', () => {
+             renderLevelsList(); // Ensure level list is up-to-date
+             showScreen('levels-screen');
+        });
+        homeSettingsBtn.addEventListener('click', () => showScreen('settings-screen'));
+        homeDevInfoBtn.addEventListener('click', () => showScreen('dev-info-screen'));
+
+        // Levels Screen Button
+        levelsBackBtn.addEventListener('click', () => showScreen('home-screen'));
+
+        // Game Screen Buttons
+        pauseButton.addEventListener('click', togglePause);
+        backButton.addEventListener('click', () => {
+            // Optional: Add confirmation prompt here
+             hideAllModals(); // Hide pause if open
+             isPaused = false; // Ensure not paused
+             showScreen('levels-screen'); // Go back to levels
+             renderLevelsList(); // Refresh levels list status
+        });
+
+
+        // Settings Screen
+        settingsBackBtn.addEventListener('click', () => showScreen('home-screen'));
+        musicToggle.addEventListener('change', updateAudioSettings);
+        sfxToggle.addEventListener('change', updateAudioSettings);
+
+
+        // Developer Info Screen
+        devInfoBackBtn.addEventListener('click', () => showScreen('home-screen'));
+
+
+        // Pop-up Buttons
+        nextLevelBtn.addEventListener('click', () => {
+            hideModal('win-popup');
+             // Check if it was the last level before attempting to start next
+             if (currentLevel < totalLevels) {
+                 startGame(currentLevel + 1);
+             } else {
+                 // Player finished all levels, maybe go back to home or levels list
+                 showScreen('levels-screen');
+             }
+        });
+        winLevelsBtn.addEventListener('click', () => { hideModal('win-popup'); showScreen('levels-screen'); renderLevelsList(); });
+
+        retryLevelBtn.addEventListener('click', () => { hideModal('lose-popup'); startGame(currentLevel); }); // Restart current level
+        loseLevelsBtn.addEventListener('click', () => { hideModal('lose-popup'); showScreen('levels-screen'); renderLevelsList(); });
+
+        resumeButton.addEventListener('click', togglePause); // Resume from pause
+        pauseLevelsBtn.addEventListener('click', () => { hideModal('pause-popup'); isPaused = false; showScreen('levels-screen'); renderLevelsList(); });
+        pauseHomeBtn.addEventListener('click', () => { hideModal('pause-popup'); isPaused = false; showScreen('home-screen'); });
+
+
+        // --- Initial Setup ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set initial settings toggle state based on loaded preferences
+            musicToggle.checked = musicEnabled;
+            sfxToggle.checked = sfxEnabled;
+
+            // Start background music (will respect settings)
+             // This might still be blocked by browser autoplay policies.
+             // It's often better to start music after the first user click on the home screen.
+             homePlayBtn.addEventListener('click', playMusic, { once: true });
+             homeLevelsBtn.addEventListener('click', playMusic, { once: true });
+             homeSettingsBtn.addEventListener('click', playMusic, { once: true });
+             homeDevInfoBtn.addEventListener('click', playMusic, { once: true });
+
+
+            // Show the home screen initially
+            showScreen('home-screen');
+
+            // Ensure candy sizes are calculated correctly after initial render
+             window.addEventListener('resize', adjustCandySizes);
+        });
+
+    </script>
 </body>
 </html>
