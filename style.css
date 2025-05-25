@@ -1,0 +1,168 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to bottom, #1a2a6c, #b21f1f, #fdbb2d); /* Example: Deep Blue to Icy Blue gradient */
+    background: linear-gradient(to bottom, #0a2351, #003f7f, #006bbf, #0096c7, #48cae4); /* Another blue gradient example */
+    background: linear-gradient(to bottom, #023e8a, #0077b6, #0096c7, #00b4d8, #48cae4, #90e0ef, #ade8f4, #caf0f8); /* Multi-stop blue gradient */
+    background-size: cover;
+    color: #fff; /* White text for contrast */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden; /* Prevent scrollbars if sparkles/snowflakes are added later */
+}
+
+.game-container {
+    background: rgba(0, 0, 50, 0.6); /* Semi-transparent dark blue background */
+    border-radius: 20px; /* Rounded corners */
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 100, 255, 0.5); /* Subtle glow */
+    max-width: 90%; /* Responsive width */
+    width: 400px; /* Max width for larger screens */
+    margin: 20px auto; /* Center horizontally and add vertical space */
+    position: relative; /* Needed for absolute positioning of sparkles later */
+    overflow: hidden; /* Hide content outside rounded corners */
+    backdrop-filter: blur(5px); /* Frosted glass effect */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+}
+
+.game-title {
+    font-size: 2em;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #e0f7fa; /* Light blue */
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+    font-size: 1.1em;
+    color: #bbdefb; /* Slightly darker light blue */
+}
+
+#game-board {
+    display: grid;
+    /* Grid columns will be set by JavaScript based on board size */
+    gap: 5px; /* Space between candies */
+    margin: 0 auto; /* Center the board */
+    padding: 10px;
+    background-color: rgba(0, 0, 100, 0.3); /* Subtle board background */
+    border-radius: 10px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.candy {
+    width: 50px; /* Adjust size based on board size and screen */
+    height: 50px; /* Make them square */
+    background-color: rgba(255, 255, 255, 0.2); /* Subtle candy background */
+    border-radius: 10px; /* Rounded candy shape */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5em; /* Size of the emoji */
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.3s ease; /* Smooth transitions for swap and removal */
+    user-select: none; /* Prevent text selection */
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    position: relative; /* For sparkle effects */
+}
+
+.candy:hover {
+    transform: scale(1.05); /* Slight bounce on hover */
+}
+
+.candy.selected {
+    border: 3px solid #ffeb3b; /* Yellow border for selected candy */
+    box-shadow: 0 0 15px #ffeb3b; /* Glow effect */
+    transform: scale(1.1); /* Slightly larger when selected */
+}
+
+.candy.removing {
+    opacity: 0; /* Fade out when removing */
+    transform: scale(0.5); /* Shrink when removing */
+}
+
+.message-area {
+    margin-top: 20px;
+    font-size: 1.2em;
+    color: #90caf9; /* Light blue */
+    min-height: 1.5em; /* Reserve space */
+}
+
+.play-button {
+    background: linear-gradient(to right, #29b6f6, #4fc3f7); /* Blue gradient button */
+    color: white;
+    border: none;
+    border-radius: 25px; /* Pill shape */
+    padding: 12px 30px;
+    font-size: 1.2em;
+    cursor: pointer;
+    margin-top: 20px;
+    box-shadow: 0 5px 15px rgba(0, 100, 255, 0.4);
+    transition: background 0.3s ease, transform 0.1s ease;
+}
+
+.play-button:hover {
+    background: linear-gradient(to right, #4fc3f7, #81d4fa);
+    transform: translateY(-2px); /* Lift effect */
+}
+
+.play-button:active {
+    transform: translateY(0); /* Press effect */
+    box-shadow: 0 2px 10px rgba(0, 100, 255, 0.6);
+}
+
+/* Add styles for floating sparkles/snowflakes here later using pseudo-elements or generated divs */
+/* Example: */
+/* body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    background-image: url('path/to/sparkles.png'); // Or generate with JS/CSS animations
+    animation: sparkle-flow 20s linear infinite;
+} */
+
+/* @keyframes sparkle-flow {
+    0% { background-position: 0 0; }
+    100% { background-position: 500px 1000px; } // Example animation
+} */
+
+
+/* --- Responsive adjustments (Optional for this basic version, but crucial for mobile) --- */
+@media (max-width: 600px) {
+    .game-container {
+        padding: 15px;
+        margin: 10px auto;
+        max-width: 95%;
+    }
+    .game-title {
+        font-size: 1.8em;
+    }
+    .game-info {
+        font-size: 1em;
+    }
+    .candy {
+        width: 40px; /* Adjust size for smaller screens */
+        height: 40px;
+        font-size: 2em;
+        border-radius: 8px;
+    }
+    #game-board {
+         gap: 3px;
+         padding: 8px;
+    }
+     .play-button {
+        padding: 10px 20px;
+        font-size: 1em;
+    }
+}
